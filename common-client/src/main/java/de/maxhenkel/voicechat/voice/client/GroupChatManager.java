@@ -30,6 +30,12 @@ public class GroupChatManager {
 
         List<PlayerState> groupMembers = getGroupMembers(VoicechatClient.CLIENT_CONFIG.showOwnGroupIcon.get());
 
+        if (VoicechatClient.CLIENT_CONFIG.showGroupOnlyTalkingPlayers.get()) {
+            groupMembers = groupMembers.stream()
+                    .filter(state -> client.getTalkCache().isTalking(state.getUuid()))
+                    .toList();
+        }
+
         guiGraphics.pose().pushMatrix();
         int posX = VoicechatClient.CLIENT_CONFIG.groupPlayerIconPosX.get();
         int posY = VoicechatClient.CLIENT_CONFIG.groupPlayerIconPosY.get();
