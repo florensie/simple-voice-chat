@@ -46,20 +46,21 @@ public class GroupChatManager {
 
         boolean vertical = VoicechatClient.CLIENT_CONFIG.groupPlayerIconOrientation.get().equals(GroupPlayerIconOrientation.VERTICAL);
 
-        for (int i = 0; i < groupMembers.size(); i++) {
-            PlayerState state = groupMembers.get(i);
+        float currentOffset = 0F;
+        for (PlayerState state : groupMembers) {
             guiGraphics.pose().pushMatrix();
+
             if (vertical) {
                 if (posY < 0) {
-                    guiGraphics.pose().translate(0F, i * -11F);
+                    guiGraphics.pose().translate(0F, -currentOffset);
                 } else {
-                    guiGraphics.pose().translate(0F, i * 11F);
+                    guiGraphics.pose().translate(0F, currentOffset);
                 }
             } else {
                 if (posX < 0) {
-                    guiGraphics.pose().translate(i * -11F, 0F);
+                    guiGraphics.pose().translate(-currentOffset, 0F);
                 } else {
-                    guiGraphics.pose().translate(i * 11F, 0F);
+                    guiGraphics.pose().translate(currentOffset, 0F);
                 }
             }
 
@@ -78,6 +79,24 @@ public class GroupChatManager {
                 guiGraphics.pose().popMatrix();
             }
 
+            if (VoicechatClient.CLIENT_CONFIG.showGroupPlayerNames.get()) {
+                float fontScale = 4F / (float) mc.font.lineHeight;
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().translate(posX < 0 ? -11F : 11F, (posY < 0 ? -10F : 0F) + 3F);
+                guiGraphics.pose().scale(fontScale, fontScale);
+                if (posX < 0) {
+                    guiGraphics.drawString(mc.font, state.getName(), -mc.font.width(state.getName()), 0, 0xFFFFFFFF, true);
+                } else {
+                    guiGraphics.drawString(mc.font, state.getName(), 0, 0, 0xFFFFFFFF, true);
+                }
+                guiGraphics.pose().popMatrix();
+
+                if (!vertical) {
+                    currentOffset += (mc.font.width(state.getName()) * (4F / (float) mc.font.lineHeight)) + 2F;
+                }
+            }
+
+            currentOffset += 11F;
             guiGraphics.pose().popMatrix();
         }
 

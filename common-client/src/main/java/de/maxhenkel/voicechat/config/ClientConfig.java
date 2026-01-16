@@ -38,6 +38,7 @@ public class ClientConfig {
     public ConfigEntry<Boolean> showNametagIcons;
     public ConfigEntry<Boolean> showHudIcons;
     public ConfigEntry<Boolean> showGroupHud;
+    public ConfigEntry<Boolean> showGroupPlayerNames;
     public ConfigEntry<Boolean> showOwnGroupIcon;
     public ConfigEntry<Double> groupHudIconScale;
     public ConfigEntry<GroupPlayerIconOrientation> groupPlayerIconOrientation;
@@ -152,6 +153,10 @@ public class ClientConfig {
         showGroupHud = builder
                 .booleanEntry("show_group_hud", true,
                         "If the group chat HUD should be visible"
+                );
+        showGroupPlayerNames = builder
+                .booleanEntry("show_group_player_names", false,
+                        "If the player names should be shown in the group chat HUD"
                 );
         showOwnGroupIcon = builder
                 .booleanEntry("show_own_group_icon", true,
