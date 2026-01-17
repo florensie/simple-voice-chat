@@ -6,13 +6,19 @@ import de.maxhenkel.voicechat.gui.GameProfileUtils;
 import de.maxhenkel.voicechat.voice.common.PlayerState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class GroupChatManager {
@@ -90,10 +96,11 @@ public class GroupChatManager {
                 guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(posX < 0 ? -11F : 11F, (posY < 0 ? -10F : 0F) + 3F);
                 guiGraphics.pose().scale(fontScale, fontScale);
+                Component name = getNameForPlayerState(state);
                 if (posX < 0) {
-                    guiGraphics.drawString(mc.font, state.getName(), -mc.font.width(state.getName()), 0, 0xFFFFFFFF, true);
+                    guiGraphics.drawString(mc.font, name, -mc.font.width(state.getName()), 0, 0xFFFFFFFF, true);
                 } else {
-                    guiGraphics.drawString(mc.font, state.getName(), 0, 0, 0xFFFFFFFF, true);
+                    guiGraphics.drawString(mc.font, name, 0, 0, 0xFFFFFFFF, true);
                 }
                 guiGraphics.pose().popMatrix();
 
@@ -107,6 +114,16 @@ public class GroupChatManager {
         }
 
         guiGraphics.pose().popMatrix();
+    }
+
+    private static @NotNull Component getNameForPlayerState(PlayerState state) {
+        return Optional.ofNullable(Minecraft.getInstance().player)
+                .map(p -> p.connection.getPlayerInfo(state.getUuid()))
+                .map(PlayerInfo::getTabListDisplayName)
+                .orElseGet(() -> {
+                    Voicechat.LOGGER.warn("Could not find player with UUID {} in tab list", state.getUuid());
+                    return Component.literal(state.getName());
+                });
     }
 
     public static List<PlayerState> getGroupMembers() {
